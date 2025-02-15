@@ -44,7 +44,6 @@ flask_session/
 *.sublime-project
 
 # Local development configuration
-config.py
 *.db
 *.sqlite3
 

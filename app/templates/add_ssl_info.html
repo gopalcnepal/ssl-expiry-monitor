@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add SSL Info</title>
+    </head>
+    <body>
+        <h1>Add SSL Info</h1>
+        <form action="{{ url_for('views.add') }}" method="POST">
+            <label for="domain">Domain:</label>
+            <input type="text" id="domain" name="domain">
+            <label for="notes">Notes:</label>
+            <input type="text" id="notes" name="notes">
+            <button type="submit">Add SSL Info</button>
+        </form>
+    </body>
+</html>

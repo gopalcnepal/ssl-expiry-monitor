@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SSL Info</title>
+    </head>
+    <body></body>
+        <h1>SSL Info</h1>
+        <ul>
+            {% for info in ssl_info %}
+                <li>{{ info.domain }} - {{ info.expiry_date }} - {{ info.notes }}</li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
