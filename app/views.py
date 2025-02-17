@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
 from app.services import get_all_ssl_info, get_ssl_expiry, add_ssl_info
+from datetime import datetime
 
 
 views = Blueprint('views', __name__)
@@ -7,9 +8,9 @@ views = Blueprint('views', __name__)
 @views.route('/')
 def index():
     ssl_info = get_all_ssl_info()
-    return render_template('index.html', ssl_info=ssl_info)
+    return render_template('index.html', ssl_info=ssl_info, datetime=datetime)
 
-@views.route('/add', methods=['GET', 'POST'])
+@views.route('/add', methods=['POST'])
 def add():
     if request.method == 'POST':
         domain = request.form.get('domain')

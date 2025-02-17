@@ -1,14 +1,68 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>SSL Info</title>
-    </head>
-    <body></body>
-        <h1>SSL Info</h1>
-        <ul>
-            {% for info in ssl_info %}
-                <li>{{ info.domain }} - {{ info.expiry_date }} - {{ info.notes }}</li>
-            {% endfor %}
-        </ul>
-    </body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}SSL Info{% endblock %}
+
+{% block content %}
+    <div class="container-fluid bg-dark fixed-top">
+        <h1 class="text-white text-center py-3 pt-5">SSL Info Dashboard</h1>
+    </div>
+    <br><br>
+    <div class="container pt-5">
+        <div class="row pt-5">
+            <div class="col-lg-4 border-end p-3">
+                <h5 class="card-title border-bottom">Add New Domain</h5>
+                <form action="{{ url_for('views.add') }}" method="POST">
+                    <div class="mb-3 pt-3">
+                        <label for="domain" class="form-label">Domain Name</label>
+                        <input type="text" class="form-control" id="domain" name="domain" placeholder="example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <input type="text" class="form-control" id="notes" name="notes" placeholder="Notes">
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" type="submit">Add Domain</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-8 p-3">
+                <h5 class="card-title border-bottom">Domain Expiry Information</h5>
+                <div class="table-responsive pt-3">
+                    {% if ssl_info %}
+                        <table class="table table-striped table-hover" id="ssl-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Domain</th>
+                                    <th>Expiry Date</th>
+                                    <th>Days Left</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                {% for info in ssl_info %}
+                                {% set days_remaining = (info.expiry_date - datetime.now().date()).days %}
+                                    <tr>
+                                        <th>{{ loop.index }}</th>
+                                        <td>{{ info.domain }}</td>
+                                        <td>{{ info.expiry_date.strftime('%Y-%m-%d') }}</td>
+                                        <td {% if days_remaining < 30 %}
+                                            class="bg-warning text-white"
+                                            {% elif days_remaining < 7 %}
+                                            class="bg-danger text-white"
+                                        {% endif %}>
+                                            {{ days_remaining }} day(s)
+                                        </td>
+                                        <td>{{ info.notes }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-center p-5 fst-italic">No domains added yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
