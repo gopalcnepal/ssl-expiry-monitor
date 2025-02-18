@@ -5,7 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 # Configuration
-app.config['SECRET_KEY'] = 'your-secret-key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 
 # Initialize the database
