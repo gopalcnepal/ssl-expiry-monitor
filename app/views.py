@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, request
-from app.services import get_all_ssl_info, get_ssl_expiry, add_ssl_info
+from app.services import delete_ssl_info, edit_ssl_info, get_all_ssl_info, get_ssl_expiry, add_ssl_info, update_expiry_date
 from datetime import datetime
 
 
@@ -18,4 +18,21 @@ def add():
         notes = request.form.get('notes')
         add_ssl_info(domain, expiry_date, notes)
         return redirect('/')
-    return render_template('add_ssl_info.html')
+
+@views.route('/update', methods=['GET'])
+def update():
+    update_expiry_date()
+    return redirect('/')
+
+@views.route('/delete/<int:id>', methods=['POST'])
+def delete(id):
+    delete_ssl_info(id)
+    return redirect('/')
+
+@views.route('/edit/<int:id>', methods=['POST'])
+def edit(id):
+    domain = request.form.get('domain')
+    expiry_date = get_ssl_expiry(domain)
+    notes = request.form.get('notes')
+    edit_ssl_info(id, domain, expiry_date, notes)
+    return redirect('/')
