@@ -46,6 +46,7 @@ Key features:
 * ![Bootstrap][Bootstrap]
 * ![SQLAlchemy][SQLAlchemy]
 * ![SQLite][SQLite]
+* ![Docker][Docker]
 
 ## Getting Started
 
@@ -55,6 +56,7 @@ To get a local copy up and running, follow these steps.
 
 * Python 3.8 or higher
 * pip (Python package manager)
+* Docker (for containerization)
 
 ### Installation
 
@@ -75,6 +77,18 @@ To get a local copy up and running, follow these steps.
    ```sh
    python -m flask run
    ```
+
+### Running with Docker
+
+1. Build the Docker image
+   ```sh
+   docker build -t ssl-expiry-monitor .
+   ```
+2. Run the Docker container
+   ```sh
+   docker run -p 5000:5000 ssl-expiry-monitor
+   ```
+3. Access the application at `http://localhost:5000`
 
 ## Usage
 
@@ -123,3 +137,4 @@ Project Link: [https://github.com/gopalcnepal/ssl-expiry-monitor](https://github
 [Bootstrap]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
 [SQLAlchemy]: https://img.shields.io/badge/SQLAlchemy-FF0000?style=for-the-badge&logo=python&logoColor=white
 [SQLite]: https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white
+[Docker]: https://img.shields.io/badge/Docker-0000FF?style=for-the-badge&logo=sqlite&logoColor=white
