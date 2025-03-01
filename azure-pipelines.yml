@@ -7,7 +7,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureSubscription: $(AZURE_SERVICE_CONNECTION)  # Service connection name
+  azureSubscription: $(AZURE_ACR_CONNECTION)  # Service connection name
   containerRegistry: $(ACR_NAME)  # ACR URL
   imageName: $(IMAGE_NAME)  # Name for your container image
   tag: 'latest'  # Tag image
