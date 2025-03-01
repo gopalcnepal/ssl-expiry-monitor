@@ -1,19 +1,45 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  branches:
+    include:
+      - main  # Runs on pushes to main branch
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  azureSubscription: $(AZURE_SERVICE_CONNECTION)  # Service connection name
+  containerRegistry: $(ACR_NAME)  # ACR URL
+  imageName: $(IMAGE_NAME)  # Name for your container image
+  tag: 'latest'  # Tag image
+  webAppName: $(WEB_APP_NAME)  # Azure Web App name
+  resourceGroup: $(RESOURCE_GROUP)  # Azure Resource Group
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+- stage: BuildAndPush
+  displayName: 'Build and Push Docker Image'
+  jobs:
+  - job: Build
+    steps:
+    - task: Docker@2
+      displayName: 'Build and Push Docker Image'
+      inputs:
+        command: buildAndPush
+        repository: $(imageName)
+        dockerfile: '**/Dockerfile'
+        containerRegistry: $(containerRegistry)
+        tags: |
+          $(tag)
+          $(Build.BuildId)
+
+- stage: Deploy
+  displayName: 'Deploy to Azure Web App'
+  jobs:
+  - job: Deploy
+    steps:
+    - task: AzureWebAppContainer@1
+      displayName: 'Deploy to Azure Web App'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        appName: $(webAppName)
+        containers: '$(containerRegistry)/$(imageName):$(tag)'
+
