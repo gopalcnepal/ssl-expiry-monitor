@@ -1,12 +1,14 @@
-# Docker
-# Build and push an image to Azure Container Registry
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+# Azure Pipeline
+# Run the pipeline to build and push docker image
+# On successful build and push, deploy the image to web app
 
 trigger:
-- main
+  branches:
+    include:
+      - main
 
-resources:
-- repo: self
+pool:
+  vmImage: 'ubuntu-latest'
 
 variables:
   # Container registry service connection established during pipeline creation
@@ -16,17 +18,12 @@ variables:
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
 
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
-
 stages:
 - stage: Build
   displayName: Build and push stage
   jobs:
   - job: Build
     displayName: Build
-    pool:
-      vmImage: $(vmImageName)
     steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
@@ -37,3 +34,21 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+      
+- stage: Deploy
+  displayName: Deploy image to Web App
+  dependsOn: Build # Run Deploy stage only after Build stage is run
+  condition: succeeded() # Run only if Build stage is successful
+  jobs:
+    - job: Deploy
+      displayName: Deploy
+      steps:
+        - task: AzureRmWebAppDeployment@5
+          inputs:
+            ConnectionType: 'AzureRM'
+            azureSubscription: $(AZURE_RM_CONNECTION)
+            appType: 'webAppContainer'
+            WebAppName: $(WEB_APP_NAME)
+            DockerNamespace: '$(containerRegistry)'
+            DockerRepository: '$(imageRepository)'
+            DockerImageTag: '$(tag)'
