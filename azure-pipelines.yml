@@ -5,7 +5,7 @@
 trigger:
   branches:
     include:
-      - main
+      - azure-pipeline
 
 pool:
   vmImage: 'ubuntu-latest'
