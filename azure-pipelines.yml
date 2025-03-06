@@ -12,7 +12,7 @@ pool:
 
 variables:
   # Container registry service connection established during pipeline creation
-  azureServiceConnection: 'testDevOpsMI'
+  azureServiceConnection: 'bicepTest'
   imageRepository: $(IMAGE_REPO)
   containerRegistry: $(AZURE_ACR_REPO)
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
@@ -28,7 +28,7 @@ stages:
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
-        containerRegistry: 'sslmonitoracr'
+        containerRegistry: 'acrTest'
         repository: '$(imageRepository)'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
@@ -45,9 +45,9 @@ stages:
         - task: AzureRmWebAppDeployment@5
           inputs:
             ConnectionType: 'AzureRM'
-            azureSubscription: $(azureServiceConnection)
+            azureSubscription: '$(azureServiceConnection)'
             appType: 'webAppContainer'
-            WebAppName: $(WEB_APP_NAME)
+            WebAppName: '$(WEB_APP_NAME)'
             DockerNamespace: '$(containerRegistry)'
             DockerRepository: '$(imageRepository)'
             DockerImageTag: '$(tag)'
