@@ -1,11 +1,22 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 
 app = Flask(__name__)
 
 # Configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+if os.getenv('SERVER_ENV').lower() == 'production':
+    # Use PostgreSQL for production
+    postgres_user = os.getenv('POSTGRESQL_ADMIN_USER')
+    postgres_password = os.getenv('POSTGRESQL_ADMIN_PASSWORD')
+    postgres_host = os.getenv('POSTGRESQL_URL')
+    postgres_db = os.getenv('POSTGRESQL_DATABASE_NAME')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:5432/{postgres_db}'
+else:
+    # Use SQLite for development
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///development.db'
+
 
 # Initialize the database
 db = SQLAlchemy(app)
