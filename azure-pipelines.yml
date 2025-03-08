@@ -45,7 +45,7 @@ stages:
         - task: AzureRmWebAppDeployment@5
           inputs:
             ConnectionType: 'AzureRM'
-            azureSubscription: '$(azureServiceConnection)'
+            azureSubscription: 'bicepTest'
             appType: 'webAppContainer'
             WebAppName: '$(WEB_APP_NAME)'
             DockerNamespace: '$(containerRegistry)'
