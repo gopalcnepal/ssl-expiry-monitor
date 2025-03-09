@@ -6,7 +6,8 @@ import os
 app = Flask(__name__)
 
 # Configuration
-if os.getenv('SERVER_ENV').lower() == 'production':
+server_env = os.getenv('SERVER_ENV', 'development').lower()
+if server_env == 'production':
     # Use PostgreSQL for production
     postgres_user = os.getenv('POSTGRESQL_ADMIN_USER')
     postgres_password = os.getenv('POSTGRESQL_ADMIN_PASSWORD')
