@@ -1,0 +1,41 @@
+trigger:
+  branches:
+    include:
+      - azure-pipeline
+  paths:
+    include:
+      # Run the pipeline when changes are made to the bicep folder
+      - bicep/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  RESOURCE_GROUP: $(RESOURCE_GROUP_NAME)
+  BICEP_FILE: 'bicep/main.bicep'
+
+stages:
+- stage: DeployInfrastructure
+  displayName: 'Deploy Azure Infrastructure'
+  jobs:
+  - job: DeployBicep
+    displayName: 'Deploy Bicep Resources'
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Deploy Bicep'
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az deployment group create \
+            --resource-group $(RESOURCE_GROUP) \
+            --template-file $(BICEP_FILE) \
+            --output json > infra_output.json
+    
+    #Publish the infra output as artifact
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Infra Output'
+      inputs:
+        pathToPublish: 'infra_output.json'
+        artifactName: 'infraOutput'
