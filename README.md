@@ -40,6 +40,9 @@ Key features:
 * Add notes for each domain
 * Easy-to-use dashboard interface
 
+### System Architecture and Overall Flow
+![SSL Monitor Dashboard Architecture](./screenshot/azure_resource_architecture.png)
+
 ### Built With
 
 * ![Flask][Flask]
@@ -97,6 +100,110 @@ To get a local copy up and running, follow these steps.
 3. View certificate information in the main table
 4. Use the refresh button to update certificate information
 5. Edit or delete entries as needed
+
+
+
+### Azure Deployment Configurations
+To deploy this project to Azure you will need to perform **ONE time** setup of Azure resources and Azure DevOps.
+
+#### Prerequisites
+* Azure subscription
+* User with required permissions
+
+#### Setting up Azure Group and Managed Identity
+
+1. Azure Group Creation:
+   * Login to Azure Portal
+   * Search for "Resource Group"
+   * Click "Create"
+   * Enter details and Create the Resource Group
+   ![Create Azure Resource Group](./screenshot/create_azure_rg.png)
+
+2. Managed Identity Creation:
+   * Login to Azure Portal
+   * Search for "Managed Identites"
+   * Click "Create"
+   * Enter details as required (Note: Select resource group created in previous step)
+   ![Create Managed Identity](./screenshot/create_azure_mi.png)
+
+3. Assign Role to Managed Identity:
+   * Login to Azure Portal
+   * Go to Managed Identity created in previous step
+   * Select "Azure Role Assignment"
+   * Click "Add role assignment "
+   * Provide "Owner" role to Resource Group created earlier.
+   ![Managed Identity Permission](./screenshot/managed_identity_permission.png)
+
+
+### Azure DevOps Configurations
+This section provides information on Azure DevOps setup. This is **ONE Time** setup. You need to change if there is change in infrastructure resource provisioning or permissions.
+
+#### Prerequisites
+* Azure subscription
+* Azure DevOps organization and project
+* User with required permissions
+
+#### A. Azure DevOps Pipeline Setup
+
+The project contains two pipelines:
+* Infrastructure Pipeline (`infra-pipeline.yml`) - Deploys Azure resources
+* Application Pipeline (`deploy-app-pipeline.yml`) - Builds and deploys the application
+
+1. **Infrastructure Pipeline**:
+   * Create new pipeline in Azure DevOps
+   * Select "Azure Repos Git" as source
+   * Select repository
+   * Choose "Existing Azure Pipelines YAML file"
+   * Path: `.azure-pipelines/infra-pipeline.yml`
+   * Configure variables:
+     ```yaml
+     RESOURCE_GROUP_NAME
+     ```
+     ![Infrastructure Deployment Pipeline](./screenshot/infra_deploy_pipeline.png)
+
+2. **Application Pipeline**:
+   * Create another pipeline
+   * Select "Azure Repos Git" as source
+   * Select repository
+   * Choose "Existing Azure Pipelines YAML file"
+   * Path: `.azure-pipelines/deploy-app-pipeline.yml`
+   * Configure variables:
+     ```yaml
+     IMAGE_REPO
+     AZURE_ACR_REPO
+     WEB_APP_NAME
+     ```
+     ![App Deploy Pipeline](./screenshot/app_deploy_pipeline.png)
+
+#### B. Setting up Service Connections
+
+1. Create an Azure Service Connection:
+   * Go to Project Settings > Service Connections
+   * Click "New Service Connection"
+   * Select "Azure Resource Manager"
+   * Choose "Managed Identity"
+   * Select your subscription, resource group and Managed Identity created previously.
+   * Name it "AzureServiceConnection". **(Important: If you named it differently, change it in pipeline too)**
+   * Check "Grant access permission to all pipelines"
+   * Click "Save"
+
+
+**IMPORTANT!**
+
+This step 2 needs to be done ONLY after the resources has been deployed by first pipeline (infra-pipeline.yml). This is because it connects Azure DevOps to provide special permission to Azure Container Registry.
+
+2. Create an Azure Container Registry Service Connection:
+   * Go to Project Settings > Service Connections
+   * Click "New Service Connection"
+   * Select "Docker Registry"
+   * Choose "Azure Container Registry"
+   * Select your subscription and registry
+   * Name it "AzureContainerRegistryServiceConnection"**(Important: If you named it differently, change it in pipeline too)**
+   * Check "Grant access permission to all pipelines"
+   * Click "Save"
+   ![ACR Service Connection](./screenshot/acr_service_connection.png)
+
+
 
 The dashboard will show visual alerts:
 * 🟡 Yellow warning for certificates expiring within 30 days
