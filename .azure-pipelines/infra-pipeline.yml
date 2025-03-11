@@ -1,7 +1,9 @@
-trigger:
+
+# Azure Pipeline
+# Run the pipeline to deploy azure resources
   branches:
     include:
-      - azure-pipeline
+      - main
   paths:
     include:
       # Run the pipeline when changes are made to the bicep folder
