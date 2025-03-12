@@ -102,6 +102,20 @@ To get a local copy up and running, follow these steps.
 5. Edit or delete entries as needed
 
 
+#### Database connectivity
+By default the application uses SQLite Database. If you want to use the `Postgresql` Database, you need to set few environment variables:
+
+```
+   SERVER_ENV = "production"
+   POSTGRESQL_ADMIN_USER = <Your Postgres Username>
+   POSTGRESQL_ADMIN_PASSWORD = <Your Postgres Password>
+   POSTGRESQL_URL = <Your Postgres Server hostname>
+   POSTGRESQL_DATABASE_NAME = <Your Postgres Database name>
+```
+
+You need to set `SERVER_ENV` value to be `production` to use postgres. You need the server to be accessible via default PORT **5432**.
+
+For Azure Deployment these variables are set automatically and you do not need to assign these environment variables.
 
 ### Azure Deployment Configurations
 To deploy this project to Azure you will need to perform **ONE time** setup of Azure resources and Azure DevOps.
