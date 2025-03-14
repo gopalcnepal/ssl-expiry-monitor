@@ -68,11 +68,16 @@ stages:
       steps:
         - task: ArchiveFiles@2
           inputs:
-            rootFolderOrFile: '$(Build.BinariesDirectory)/update_domain_function/'
+            rootFolderOrFile: '$(workingDirectory)/update_domain_function/'
             includeRootFolder: true
             archiveType: 'zip'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
             replaceExistingArchive: true
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            ArtifactName: 'functionApp'
+            publishLocation: 'Container'
         - task: AzureFunctionApp@2
           inputs:
             connectedServiceNameARM: '$(azureServiceConnection)'
