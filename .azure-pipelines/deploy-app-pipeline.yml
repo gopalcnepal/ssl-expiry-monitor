@@ -84,4 +84,4 @@ stages:
             appType: 'functionAppLinux'
             isFlexConsumption: true
             appName: '$(azureFunctionName)'
-            package: '$(Build.ArtifactStagingDirectory)/functionApp/$(Build.BuildId).zip'
+            package: '$(Build.ArtifactStagingDirectory)/**/$(Build.BuildId).zip'
