@@ -6,8 +6,8 @@ import requests
 app = func.FunctionApp()
 
 # Trigger function to update the SSL expiry date every day at midnight
-@app.timer_trigger(schedule="0 0 * * *", arg_name="myTimer", run_on_startup=False,
-              use_monitor=False) 
+@app.timer_trigger(schedule="0 0 * * *", arg_name="myTimer", run_on_startup=True,
+              use_monitor=True) 
 
 
 # Define the function to update the SSL expiry date
