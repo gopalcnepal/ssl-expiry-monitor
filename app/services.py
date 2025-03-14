@@ -3,6 +3,7 @@ import socket
 from datetime import datetime
 from app.models import SSLInfo
 from app import db
+import logging
 
 def get_ssl_expiry(domain):
     try:
@@ -19,6 +20,7 @@ def add_ssl_info(domain, expiry_date, notes):
     ssl_info = SSLInfo(domain=domain, expiry_date=expiry_date, notes=notes)
     db.session.add(ssl_info)
     db.session.commit()
+    logging.info(f"SSL Info added for {domain}")
 
 def get_all_ssl_info():
     return SSLInfo.query.all()
@@ -29,6 +31,7 @@ def edit_ssl_info(id, domain, expiry_date, notes):
     ssl_info.expiry_date = expiry_date
     ssl_info.notes = notes
     db.session.commit()
+    logging.info(f"SSL Info updated for {domain}")
 
 def update_expiry_date():
     ssl_info = get_all_ssl_info()
@@ -36,8 +39,10 @@ def update_expiry_date():
         expiry_date = get_ssl_expiry(info.domain)
         info.expiry_date = expiry_date
         db.session.commit()
+        logging.info(f"SSL Expiry Date updated for {info.domain}")
 
 def delete_ssl_info(id):
     ssl_info = SSLInfo.query.get(id)
     db.session.delete(ssl_info)
     db.session.commit()
+    logging.info(f"SSL Info deleted for {ssl_info.domain}")

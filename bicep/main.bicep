@@ -218,3 +218,120 @@ resource keyVaultSystemIdentityRoleAssignment 'Microsoft.Authorization/roleAssig
     principalType: 'ServicePrincipal'
   }
 }
+
+
+// Azure Function App Deployment
+
+// Storage Account as required by Azure Functions
+resource storageaccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
+  name: 'storage${uniqueStringValue}'
+  location: location
+  kind: 'StorageV2'
+  sku: {
+    name: 'Standard_LRS'
+  }
+}
+
+// Create blob container in storage account
+resource blobservice 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
+  name: 'default'
+  parent: storageaccount
+}
+
+resource functionContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  name: 'container${uniqueStringValue}'
+  parent: blobservice
+  properties: {
+    publicAccess: 'None'
+  }
+}
+
+
+// Application Insights for Azure Functions
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
+  name: 'appInsights${uniqueStringValue}'
+  location: location
+  kind: 'web'
+  properties: {
+    Application_Type: 'web'
+  }
+}
+
+// App Service Plan for Azure Functions
+resource functionAppPlan 'Microsoft.Web/serverfarms@2024-04-01' = {
+  name: 'functionAppPlan${uniqueStringValue}'
+  location: location
+  kind: 'functionapp'
+  sku: {
+    tier: 'FlexConsumption'
+    name: 'FC1'
+  }
+  properties: {
+    reserved: true
+  }
+}
+
+// Azure Functions
+resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
+  name: 'functionApp${uniqueStringValue}'
+  location: location
+  kind: 'functionapp,linux'
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    serverFarmId: functionAppPlan.id
+    siteConfig: {
+      appSettings: [
+        { 
+          name: 'SSL_MONITOR_URL'
+          value: 'https://${webApp.properties.defaultHostName}/update' // Domain Update URL from web app
+        }
+        {
+          name: 'AzureWebJobsStorage__accountName'
+          value: storageaccount.name
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: appInsights.properties.ConnectionString
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~4'
+        }
+      ]
+    }
+    functionAppConfig:{
+      deployment: {
+        storage: {
+          type: 'blobContainer'
+          value: '${storageaccount.properties.primaryEndpoints.blob}${functionContainer.name}'
+          authentication: {
+            type: 'SystemAssignedIdentity'
+          }
+        }
+      }
+      scaleAndConcurrency: {
+        maximumInstanceCount: 100
+        instanceMemoryMB: 2048
+      }
+      runtime: { 
+        name: 'python'
+        version: '3.12'
+      }
+    }
+  }
+}
+
+var storageRoleDefinitionId  = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' //Storage Blob Data Owner role
+
+// Allow access from function app to storage account using a managed identity
+resource storageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(storageaccount.id, storageRoleDefinitionId)
+  scope: storageaccount
+  properties: {
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', storageRoleDefinitionId)
+    principalId: functionApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
