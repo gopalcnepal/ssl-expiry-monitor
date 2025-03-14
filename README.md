@@ -39,6 +39,11 @@ Key features:
 * Visual alerts for certificates expiring soon
 * Add notes for each domain
 * Easy-to-use dashboard interface
+* CICD using Azure Devops for Infrastructure and application deployment
+* Key Vault for secure secret access
+* Azure Funtion for updating domain as per scheduled time
+* Integration with various Azure resources
+* Azure Bicep for creating resources
 
 ### System Architecture and Overall Flow
 ![SSL Monitor Dashboard Architecture](./screenshot/azure_resource_architecture.png)
@@ -50,6 +55,7 @@ Key features:
 * ![SQLAlchemy][SQLAlchemy]
 * ![SQLite][SQLite]
 * ![Docker][Docker]
+* ![Azure][Azure]
 
 ## Getting Started
 
@@ -183,9 +189,12 @@ The project contains two pipelines:
    * Path: `.azure-pipelines/deploy-app-pipeline.yml`
    * Configure variables:
      ```yaml
+     ACR_SERVICE_CONNECTION
+     AZURE_SERVICE_CONNECTION
      IMAGE_REPO
      AZURE_ACR_REPO
      WEB_APP_NAME
+     AZURE_FUNCTION_NAME
      ```
      ![App Deploy Pipeline](./screenshot/app_deploy_pipeline.png)
 
@@ -258,4 +267,5 @@ Project Link: [https://github.com/gopalcnepal/ssl-expiry-monitor](https://github
 [Bootstrap]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
 [SQLAlchemy]: https://img.shields.io/badge/SQLAlchemy-FF0000?style=for-the-badge&logo=python&logoColor=white
 [SQLite]: https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white
-[Docker]: https://img.shields.io/badge/Docker-0000FF?style=for-the-badge&logo=sqlite&logoColor=white
+[Docker]: https://img.shields.io/badge/Docker-0000FF?style=for-the-badge&logo=docker&logoColor=white
+[Azure]: https://custom-icon-badges.demolab.com/badge/Microsoft%20Azure-0089D6?logo=msazure&logoColor=white
