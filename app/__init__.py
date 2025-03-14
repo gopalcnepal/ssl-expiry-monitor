@@ -1,6 +1,16 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
 
 
 app = Flask(__name__)
