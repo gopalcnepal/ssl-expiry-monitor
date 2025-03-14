@@ -66,6 +66,13 @@ stages:
     - job: DeployFunction
       displayName: Deploy Azure Function
       steps:
+        - task: ArchiveFiles@2
+          inputs:
+            rootFolderOrFile: '$(Build.BinariesDirectory)/update_domain_function/'
+            includeRootFolder: true
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+            replaceExistingArchive: true
         - task: AzureFunctionApp@2
           inputs:
             connectedServiceNameARM: '$(azureServiceConnection)'
