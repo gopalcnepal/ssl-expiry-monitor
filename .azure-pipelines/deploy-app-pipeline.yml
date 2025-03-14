@@ -21,6 +21,11 @@ variables:
   containerRegistry: $(AZURE_ACR_REPO)
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
+  acrServiceConnection: $(ACR_SERVICE_CONNECTION)
+  azureServiceConnection: $(AZURE_SERVICE_CONNECTION)
+  webAppName: $(WEB_APP_NAME)
+  azureFunctionName: $(AZURE_FUNCTION_NAME)
+
 
 stages:
 - stage: Build
@@ -32,26 +37,39 @@ stages:
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
-        containerRegistry: 'AzureContainerRegistryServiceConnection'
+        containerRegistry: '$(acrServiceConnection)'
         repository: '$(imageRepository)'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
         tags: '$(tag)'
       
 - stage: Deploy
-  displayName: Deploy image to Web App
+  displayName: Deploying application
   dependsOn: Build # Run Deploy stage only after Build stage is run
   condition: succeeded() # Run only if Build stage is successful
   jobs:
-    - job: Deploy
-      displayName: Deploy
+      # Deploy the SSL Monitor Dashboard Web Application
+    - job: DeployWebApp
+      displayName: Deploy Web Application
       steps:
         - task: AzureRmWebAppDeployment@5
           inputs:
             ConnectionType: 'AzureRM'
-            azureSubscription: 'AzureServiceConnection'
+            azureSubscription: '$(azureServiceConnection)'
             appType: 'webAppContainer'
-            WebAppName: '$(WEB_APP_NAME)'
+            WebAppName: '$(webAppName)'
             DockerNamespace: '$(containerRegistry)'
             DockerRepository: '$(imageRepository)'
             DockerImageTag: '$(tag)'
+
+      # Deploy the Update Domain Azure Function
+    - job: DeployFunction
+      displayName: Deploy Azure Function
+      steps:
+        - task: AzureFunctionApp@2
+          inputs:
+            connectedServiceNameARM: '$(azureServiceConnection)'
+            appType: 'functionAppLinux'
+            isFlexConsumption: true
+            appName: '$(azureFunctionName)'
+            package: '$(System.DefaultWorkingDirectory)/**/*.zip'
