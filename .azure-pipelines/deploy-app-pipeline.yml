@@ -68,8 +68,8 @@ stages:
       steps:
         - task: ArchiveFiles@2
           inputs:
-            rootFolderOrFile: '$(workingDirectory)/update_domain_function/'
-            includeRootFolder: true
+            rootFolderOrFile: 'update_domain_function'
+            includeRootFolder: false
             archiveType: 'zip'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
             replaceExistingArchive: true
@@ -84,4 +84,4 @@ stages:
             appType: 'functionAppLinux'
             isFlexConsumption: true
             appName: '$(azureFunctionName)'
-            package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+            package: '$(Build.ArtifactStagingDirectory)/functionApp/$(Build.BuildId).zip'
